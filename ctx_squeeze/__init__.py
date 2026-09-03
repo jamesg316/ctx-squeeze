@@ -1,4 +1,5 @@
 from ctx_squeeze.dedupe import jaccard, shingles
+from ctx_squeeze.score import score_segments, select_by_score
 from ctx_squeeze.segments import Segment, split_segments
 from ctx_squeeze.tokens import estimate_tokens, truncate_to_tokens
 
@@ -9,4 +10,6 @@ __all__ = [
     "split_segments",
     "shingles",
     "jaccard",
+    "score_segments",
+    "select_by_score",
 ]
