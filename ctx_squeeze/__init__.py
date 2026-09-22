@@ -5,7 +5,13 @@ from ctx_squeeze.segments import Segment, split_segments
 from ctx_squeeze.squeeze import SqueezeResult, squeeze
 from ctx_squeeze.tokens import estimate_tokens, truncate_to_tokens
 
+# Kept in sync with pyproject.toml by hand; there's only one release process
+# here and importlib.metadata would fail on a plain checkout that was never
+# pip-installed.
+__version__ = "0.1.0"
+
 __all__ = [
+    "__version__",
     "estimate_tokens",
     "truncate_to_tokens",
     "Segment",

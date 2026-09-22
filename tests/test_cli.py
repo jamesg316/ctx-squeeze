@@ -1,5 +1,8 @@
 import json
 
+import pytest
+
+from ctx_squeeze import __version__
 from ctx_squeeze.cli import main
 
 
@@ -76,3 +79,28 @@ def test_reads_from_stdin_when_input_is_dash(tmp_path, capsys, monkeypatch):
     main(["-", "--budget", "1000"])
     out = capsys.readouterr().out
     assert out.strip() == "One short paragraph."
+
+
+def test_version_flag_prints_version_and_exits(capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--version"])
+    assert excinfo.value.code == 0
+    out = capsys.readouterr().out
+    assert __version__ in out
+
+
+def test_unknown_strategy_stage_reports_usage_error(tmp_path, capsys):
+    path = _write(tmp_path / "doc.md", "One short paragraph.")
+    with pytest.raises(SystemExit) as excinfo:
+        main([path, "--budget", "1000", "--strategy", "shuffle"])
+    assert excinfo.value.code == 2
+    err = capsys.readouterr().err
+    assert "unknown stage 'shuffle'" in err
+
+
+def test_unknown_strategy_stage_not_checked_in_messages_mode(tmp_path, capsys):
+    history = [{"role": "user", "content": "hello"}]
+    path = _write(tmp_path / "chat.json", json.dumps(history))
+    main([path, "--messages", "--budget", "1000", "--strategy", "shuffle"])
+    dicts = json.loads(capsys.readouterr().out)
+    assert dicts == history

@@ -95,6 +95,10 @@ def _head_tail(segments, budget, head_ratio):
 
 _STAGES = {"dedupe": _dedupe, "score": select_by_score, "head-tail": _head_tail}
 
+# Exposed so the cli can validate --strategy before doing any work, instead
+# of letting an invalid stage name surface as a ValueError mid-pipeline.
+STRATEGY_STAGES = tuple(_STAGES)
+
 
 def _render(all_segments, kept, use_marker):
     kept_ids = {id(seg) for seg in kept}

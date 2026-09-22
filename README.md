@@ -117,6 +117,7 @@ kept 7 of 11 messages | 172 -> 106 tokens (budget 120)
 | `--stats` | off | Print a token summary to stderr |
 | `--json` | off | Emit a JSON report instead of plain text |
 | `-o PATH` | stdout | Write the result to a file |
+| `--version` |  | Print the installed version and exit |
 
 Use `-` as the input path to read standard input.
 

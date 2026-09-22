@@ -10,8 +10,9 @@ import argparse
 import json
 import sys
 
+from ctx_squeeze import __version__
 from ctx_squeeze.messages import parse_messages, prune_messages, to_dicts
-from ctx_squeeze.squeeze import squeeze
+from ctx_squeeze.squeeze import STRATEGY_STAGES, squeeze
 
 
 def _build_parser():
@@ -19,6 +20,7 @@ def _build_parser():
         prog="ctx-squeeze",
         description="Fit long documents and chat transcripts into an LLM context budget.",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("input", help="path to the input file, or - for stdin")
     parser.add_argument("--budget", type=int, required=True, help="target size in estimated tokens")
     parser.add_argument("--strategy", default="score", help="comma-separated pipeline: head-tail, score, dedupe")
@@ -119,8 +121,21 @@ def _run_messages(args, text):
     return json.dumps(dicts, indent=2)
 
 
+def _check_strategy(parser, strategy):
+    stages = [s.strip() for s in strategy.split(",") if s.strip()]
+    unknown = [s for s in stages if s not in STRATEGY_STAGES]
+    if unknown:
+        choices = ", ".join(STRATEGY_STAGES)
+        parser.error(f"--strategy: unknown stage {unknown[0]!r} (choose from {choices})")
+
+
 def main(argv=None):
-    args = _build_parser().parse_args(argv)
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+
+    if not args.messages:
+        _check_strategy(parser, args.strategy)
+
     text = _read_input(args.input)
 
     if args.messages:
